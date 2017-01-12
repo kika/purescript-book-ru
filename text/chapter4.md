@@ -133,7 +133,7 @@ X> 1. (Легкое) Напишите рекурсивную функцию, к�
 
 X> 2. (Medium) Write a recursive function which counts the number of even integers in an array. _Hint_: the function `unsafePartial head` (where `head` is also imported from `Data.Array.Partial`) can be used to find the first element in a non-empty array.
 
-X> 2. (Среднее) Напишите рекурсивную функцию, которая подсчитывает число четных чисел в массиве. _Намёк_: функция `unsafePartial head` (где `head` также импортирована из `Data.Array.Partial`) может быть использована для получения первого элемента из непустого массива.
+X> 2. (Среднее) Напишите рекурсивную функцию, которая подсчитывает число четных чисел в массиве. _Подсказка_: функция `unsafePartial head` (где `head` также импортирована из `Data.Array.Partial`) может быть использована для получения первого элемента из непустого массива.
 
 ## Maps
 ## Отображения
@@ -343,14 +343,23 @@ Note how `concatMap` concatenates its results. It calls the provided function on
 `map`, `filter` и `concatMap` формируют базу для целого спектра функций на массивах, под названием "генераторы массивов" (array comprehensions). 
 
 ## Array Comprehensions
+## Генераторы массивов
 
 Suppose we wanted to find the factors of a number `n`. One simple way to do this would be by brute force: we could generate all pairs of numbers between 1 and `n`, and try multiplying them together. If the product was `n`, we would have found a pair of factors of `n`.
 
+Предположим, что мы хотим найти все множители числа `n`. Один простой способ это сделать - мог быть грубый пебор: мы могли бы сгенерировать пары чисел от 1 до `n` и попытаться их перемножить. Если произведение будет равно `n` - мы нашли пару множителей числа `n`.
+
 We can perform this computation using an array comprehension. We will do so in steps, using PSCi as our interactive development environment.
+
+Мы можем произвести это вычисление используя генератор массива. Мы будем делать это по-шагам, используя PSCi в качестве нашей среды разработки. 
 
 The first step is to generate an array of pairs of numbers below `n`, which we can do using `concatMap`.
 
+Первым шагом будет генерация массива пар чисел меньше `n`, которую можно сделать, используя `concatMap`.
+
 Let's start by mapping each number to the array `1 .. n`:
+
+Давайте начнем с отображения каждого числа на массив `1 .. n`:
 
 ```text
 > let pairs n = concatMap (\i -> 1 .. n) (1 .. n)
@@ -358,12 +367,16 @@ Let's start by mapping each number to the array `1 .. n`:
 
 We can test our function
 
+Протестируем функцию
+
 ```text
 > pairs 3
 [1,2,3,1,2,3,1,2,3]
 ```
 
 This is not quite what we want. Instead of just returning the second element of each pair, we need to map a function over the inner copy of `1 .. n` which will allow us to keep the entire pair:
+
+Это не совсем то что мы хотели. Вместо того, чтобы просто возвращать второй элемент каждой пары, нам нужно отобразить функцию на внутреннюю копию `1 .. n`, что позволит сохранить целую пару:
 
 ```text
 > :paste
@@ -379,6 +392,8 @@ This is not quite what we want. Instead of just returning the second element of 
 
 This is looking better. However, we are generating too many pairs: we keep both [1, 2] and [2, 1] for example. We can exclude the second case by making sure that `j` only ranges from `i` to `n`:
 
+Выглядит уже лучше. Однако, мы генерируем слишком много пар: мы создаем и [1, 2], и [2, 1], к примеру. Мы можем исключить второй случай убедившись в том, что `j` варьируется только от `i` до `n`:
+
 ```text
 > :paste
 … let pairs'' n =
@@ -392,6 +407,8 @@ This is looking better. However, we are generating too many pairs: we keep both 
 
 Great! Now that we have all of the pairs of potential factors, we can use `filter` to choose the pairs which multiply to give `n`:
 
+Отлично! Теперь, когда у нас есть все потенциальные множители, мы можем использовать `filter`, выбрав только те пары, которые являются множителями `n`:
+
 ```text
 > import Data.Foldable
 
@@ -403,15 +420,25 @@ Great! Now that we have all of the pairs of potential factors, we can use `filte
 
 This code uses the `product` function from the `Data.Foldable` module in the `purescript-foldable-traversable` library.
 
+Этот код использует функцию `product` из модуля `Data.Foldable` в библиотеке `purescript-foldable-traversavle`.
+
 Excellent! We've managed to find the correct set of factor pairs without duplicates.
 
-## Do Notation
+Превосходно! Нам удалось найти правильный набор пар множителей без дублей.
+
+## Do-нотация
 
 However, we can improve the readability of our code considerably. `map` and `concatMap` are so fundamental, that they (or rather, their generalizations `map` and `bind`) form the basis of a special syntax called _do notation_.
 
+Тем не менее, мы можем значительно улучшить читаемость нашего кода. `map` и `concatMap` настолько фундаментальны, что они (или скорее, их обобщения `map` и `bind`) формируют базу специального синтаксиса под названием _do-нотация_.
+
 _Note_: Just like `map` and `concatMap` allowed us to write _array comprehensions_, the more general operators `map` and `bind` allow us to write so-called _monad comprehensions_. We'll see plenty more examples of _monads_ later in the book, but in this chapter, we will only consider arrays.
 
+_Примечание_: Так же как `map` и `concatMap` позволяет нам создавать _генераторы массивов_, более общие операторы `map` и `bind` позволяют писать созвучные _монадные генераторы_.  Мы увидем еще много примеров _монад_ далее в книге, но в этой главе мы рассмотрим только массивы.
+
 We can rewrite our `factors` function using do notation as follows:
+
+Мы можем переписать нашу функцию `factors`, используя do-нотацию, следующим образом:
 
 ```haskell
 factors :: Int -> Array (Array Int)
@@ -423,13 +450,27 @@ factors n = filter (\xs -> product xs == n) $ do
 
 The keyword `do` introduces a block of code which uses do notation. The block consists of expressions of a few types:
 
-- Expressions which bind elements of an array to a name. These are indicated with the backwards-facing arrow `<-`, with a name on the left, and an expression on the right whose type is an array.
+Ключевое слово `do`, предваряет блок кода, использующего do-нотацию. Блок состоит из выражений нескольких типов:
+
+- Expressions which bind elements of an array to a name. These are indicated with the backwards-facing arrow `<-`, with a name on the left, and an expression on the right whose type is an array. 
+
+- Выражения, которые связывают элементы массива с именем. Они обозначены стрелкой назад `<-`, с именем слева, и с выражением справа, чей тип является массивом. 
+
 - Expressions which do not bind elements of the array to names. The last line `pure [i, j]` is an example of this kind of expression.
+
+- Выражения, которые не связывают элементы массивов с именами. Последняя строка `pure [i, j]` является примером такого рода выражений.
+
 - Expressions which give names to expressions, using the `let` keyword.
+
+- Выражения, которые присваивают имена выражениям, используя ключевое слово `let`.
 
 This new notation hopefully makes the structure of the algorithm clearer. If you mentally replace the arrow `<-` with the word "choose", you might read it as follows: "choose an element `i` between 1 and n, then choose an element `j` between `i` and `n`, and return `[i, j]`".
 
+Эта новая нотация, мы надеямся, делает структуру алгоритма более ясной. Если вы мысленно замените стрелку `<-` словом "выбрать", вы сможете прочитать его следующим образом: "выбрать элемент `i` между 1 и n, затем выбрать элемент `j` между `i` и `n`, а потом вернуть `[i, j]`".
+
 In the last line, we use the `pure` function. This function can be evaluated in PSCi, but we have to provide a type:
+
+В последней строке мы использовали функцию `pure`. Эта функция может быть использована в PSCi, но нам нужно указывать тип:
 
 ```text
 > pure [1, 2] :: Array (Array Int)
@@ -437,6 +478,8 @@ In the last line, we use the `pure` function. This function can be evaluated in 
 ```
 
 In the case of arrays, `pure` simply constructs a singleton array. In fact, we could modify our `factors` function to use this form, instead of using `pure`:
+
+В случае массивов, `pure` просто создает одиночный массив. Фактически, мы можем изменить функцию `factors` для использования данной формы, вместо `pure`:
 
 ```haskell
 factors :: Int -> Array (Array Int)
@@ -448,9 +491,15 @@ factors n = filter (\xs -> product xs == n) $ do
 
 and the result would be the same.
 
+и результат будет такой же.
+
 ## Guards
+## Охранные выражения
 
 One further change we can make to the `factors` function is to move the filter inside the array comprehension. This is possible using the `guard` function from the `Control.MonadZero` module (from the `purescript-control` package):
+
+Еще одно изменение которое мы можем сделать с функцией `factors` - это переместить фильтрацию в генератор массива. Это возможно, путем использования функции `guard` из модуля `Control.MonadZero` (пакета `purescript-control`):
+
 
 ```haskell
 import Control.MonadZero (guard)
@@ -465,6 +514,8 @@ factors n = do
 
 Just like `pure`, we can apply the `guard` function in PSCi to understand how it works. The type of the `guard` function is more general than we need here:
 
+Так же как и `pure`, мы можем проверить функцию `guard` в PSCi, чтобы понять как она работает. Тип функции `guard` более общий, чем тот который нам здесь нужен:
+
 ```text
 > import Control.MonadZero
 
@@ -474,11 +525,16 @@ forall m. MonadZero m => Boolean -> m Unit
 
 In our case, we can assume that PSCi reported the following type:
 
+В нашем случае, мы можем допустить, что PSCi вывела следующий тип:
+
+
 ```haskell
 Boolean -> Array Unit
 ```
 
 For our purposes, the following calculations tell us everything we need to know about the `guard` function on arrays:
+
+Для наших целей, следующие вычисления говорят нам всё, что нам нужно знать о функции `guard` на массивах:
 
 ```text
 > import Data.Array
@@ -492,20 +548,42 @@ For our purposes, the following calculations tell us everything we need to know 
 
 That is, if `guard` is passed an expression which evaluates to `true`, then it returns an array with a single element. If the expression evaluates to `false`, then its result is empty.
 
+То есть, если `guard` получила на вход выражение, которое вычисляется в `true`, тогда возвращается массив с единственным элементом. Если выражение вычисляется в `false`, тогда результатом будет пустой массив.
+
+
 This means that if the guard fails, then the current branch of the array comprehension will terminate early with no results. This means that a call to `guard` is equivalent to using `filter` on the intermediate array. Depending on the application, you might prefer to use `guard` instead of a `filter`. Try the two definitions of `factors` to verify that they give the same results.
 
-X> ## Exercises
+Это означает, что если охранное выражение не выполнится, то текущая ветка генератора массива завершиться раньше, без результата. (?) Это значит, что вызов `guard` эквивалентен использованию `filter` на промежуточном массиве. В зависимости от приложения, вы можете предпочесть использование `guard` вместо `filter`. Попробуйте два варианта `factor`, чтобы убедиться, что оба они дают одинаковые результаты. 
+
+X> ## Упражнения
+
 X>
 X> 1. (Easy) Use the `factors` function to define a function `isPrime` which tests if its integer argument is prime or not.
+
+X> 1. (Лёгкое) Используйте функцию `factors` для написания функции `isPrime`, которое проверяет, является ли его аргумент (целое число) простым или нет.
+
 X> 1. (Medium) Write a function which uses do notation to find the _cartesian product_ of two arrays, i.e. the set of all pairs of elements `a`, `b`, where `a` is an element of the first array, and `b` is an element of the second.
+
+X> 1. (Среднее) Напишите функцию, которая использует do-нотацию для нахождения _декартового произведения_ двух массивов, то есть множество всех пар элементов `a`, `b`, где `a` - элемент первого массива, а `b` - элемент второго массива.
+
+
 X> 1. (Medium) A _Pythagorean triple_ is an array of numbers `[a, b, c]` such that `a² + b² = c²`. Use the `guard` function in an array comprehension to write a function `triples` which takes a number `n` and calculates all Pythagorean triples whose components are less than `n`. Your function should have type `Int -> Array (Array Int)`.
+
+X> 1. (Срнеднее)  _Пифагорова тройка_ - это массив чисел `[a, b, c]`, удовлетворяющих выражению `a² + b² = c²`. Используйте функцию `guard` в генераторе массива для написания функции `triples`, которая принимает число `n` и вычисляет все пифагоровы тройки, чьи компоненты меньше `n`. Ваша функция должна иметь тип `Int -> Array (Array Int)`.
+
 X> 1. (Difficult) Write a function `factorizations` which produces all _factorizations_ of an integer `n`, i.e. arrays of integers whose product is `n`. _Hint_: for an integer greater than 1, break the problem down into two subproblems: finding the first factor, and finding the remaining factors.
 
-## Folds
+X> 1. (Сложное) Напишите функцию `factorizations`, которая возвращает все _простые множители_ числа `n`, то есть массив чисел, чьё произведение равно `n`. _Подсказка_: Для целых чисел больше 1, разбейте задачу на две подзадачи: нахождения первого множителя, а затем нахождения оставшихся множетелей.
+
+## Свёртки
 
 Left and right folds over arrays provide another class of interesting functions which can be implemented using recursion.
 
+Левые и правые свёртки массивов предоствляют еще один класс интересных функций, которые могут быть реализованы с использованием рекурсии.
+
 Start by importing the `Data.Foldable` module, and inspecting the types of the `foldl` and `foldr` functions using PSCi:
+
+Начнем с импорта модуля `Data.Foldable` и просмотра типов `foldl`, и `foldr`, используя PSCi:
 
 ```text
 > import Data.Foldable
@@ -519,6 +597,8 @@ forall a b f. (Foldable f) => (a -> b -> b) -> b -> f a -> b
 
 These types are actually more general than we are interested in right now. For the purposes of this chapter, we can assume that PSCi had given the following (more specific) answer:
 
+Эти типы на самом деле более общие, чем те, что нас сейчас интересуют. Для целей нашей главы, мы предположим, что PSCi выдала следующий ответ:
+
 ```text
 > :type foldl
 forall a b. (b -> a -> b) -> b -> Array a -> b
@@ -529,9 +609,15 @@ forall a b. (a -> b -> b) -> b -> Array a -> b
 
 In both of these cases, the type `a` corresponds to the type of elements of our array. The type `b` can be thought of as the type of an "accumulator", which will accumulate a result as we traverse the array.
 
+В обоих случаях тип `a` соответствует типу элементов нашего массива. Тип `b` можно рассматривать как тип "аккумулятора", который аккумулирует результат по мере прохождения по массиву.
+
 The difference between the `foldl` and `foldr` functions is the direction of the traversal. `foldl` folds the array "from the left", whereas `foldr` folds the array "from the right".
 
+Разница между функциями `foldl` и `foldr` это направление обхода. `foldl` "свёртывает массив слева", а `foldr` свёртывает справа.
+
 Let's see these functions in action. Let's use `foldl` to sum an array of integers. The type `a` will be `Int`, and we can also choose the result type `b` to be `Int`. We need to provide three arguments: a function `Int -> Int -> Int`, which will add the next element to the accumulator, an initial value for the accumulator of type `Int`, and an array of `Int`s to add. For the first argument, we can just use the addition operator, and the initial value of the accumulator will be zero:
+
+Давайте увидем эти функции в действии. Используем `foldl` для складывание массива целых чисел. Типом `a` будет `Int`, и мы можем выбрать тип `Int` и для `b`. Нам нужно предоставить три аргумента: функцию `Int -> Int -> Int`, которая складывает следующий элемент с аккумулятором, начальное значение аккумулятора с типом `Int`, а также массив целых чисел для складывания. В качестве первого аргумента, мы можем просто использовать оператор сложения, а начальное значение аккумулятора будет ноль:
 
 ```text
 > foldl (+) 0 (1 .. 5)
@@ -540,12 +626,16 @@ Let's see these functions in action. Let's use `foldl` to sum an array of intege
 
 In this case, it didn't matter whether we used `foldl` or `foldr`, because the result is the same, no matter what order the additions happen in:
 
+В данном случае, не имеет значения, какая используется функция `foldl` или `foldr`, потому что результат будет одинаковый. Не важно, в каком порядке происходит сложение:
+
 ```text
 > foldr (+) 0 (1 .. 5)
 15
 ```
 
 Let's write an example where the choice of folding function does matter, in order to illustrate the difference. Instead of the addition function, let's use string concatenation to build a string:
+
+Давайте напишем пример, где выбор функции будет иметь значение, чтобы продемонстрировать разницу. Вместо функции сложения, используем функцию конкатенации для построения строки: 
 
 ```text
 > foldl (\acc n -> acc <> show n) "" [1,2,3,4,5]
@@ -557,21 +647,31 @@ Let's write an example where the choice of folding function does matter, in orde
 
 This illustrates the difference between the two functions. The left fold expression is equivalent to the following application:
 
+Это иллюстрирует разницу между двумя этими функциями. Выражение левой свёртки эквивалентно следующей конструкции:
+
 ```text
 ((((("" <> show 1) <> show 2) <> show 3) <> show 4) <> show 5)
 ```
 
 whereas the right fold is equivalent to this:
 
+в то время как правая свёртка эквивалентна этой:
+
 ```text
 ((((("" <> show 5) <> show 4) <> show 3) <> show 2) <> show 1)
 ```
 
 ## Tail Recursion
+## Хвостовая рекурсия (нужно внимательно перечитать раздел)
 
 Recursion is a powerful technique for specifying algorithms, but comes with a problem: evaluating recursive functions in JavaScript can lead to stack overflow errors if our inputs are too large.
 
+Рекурсия является мощным средством для создания алгоритмов, но которая приходит с проблемой: вычисление рекурсивных функций в JavaScript может привести к ошибкам переполнения стека, если количество вызовов будет очень много.
+
 It is easy to verify this problem, with the following code in PSCi:
+
+Легко подтвердить эту проблему, введя следующий код в PSCi:
+
 
 ```text
 > let f 0 = 0
@@ -586,15 +686,27 @@ RangeError: Maximum call stack size exceeded
 
 This is a problem. If we are going to adopt recursion as a standard technique from functional programming, then we need a way to deal with possibly unbounded recursion.
 
+Это проблема. Если мы собираемся принять рекурсию как стандартную технику функционального программирования, тогда нам необходим способ борьбы с возможной неограниченной рекурсией.
+
 PureScript provides a partial solution to this problem in the form of _tail recursion optimization_.
+
+PureScript предоставляет частичное решение этой проблемы в форме _оптимизации хвостовой рекурсии_.
 
 _Note_: more complete solutions to the problem can be implemented in libraries using so-called _trampolining_, but that is beyond the scope of this chapter. The interested reader can consult the documentation for the `purescript-free` and `purescript-tailrec` packages.
 
+_Примечание_: более полные решения проблемы могут быть реализованы в библиотеках с использованием так называемого _трамплининга_ (_trampolining_), но этой выходит за рамки данной главы. Заинтересованный читатель может обратиться к документации пакетов `purescript-free` и `purescript-tailrec`. (?)
+
 The key observation which enables tail recursion optimization is the following: a recursive call in _tail position_ to a function can be replaced with a _jump_, which does not allocate a stack frame. A call is in _tail position_ when it is the last call made before a function returns. This is the reason why we observed a stack overflow in the example - the recursive call to `f` was _not_ in tail position.
+
+Ключевое замечание, делающее возможным оптимизацию хвостовой рекурсии, следующее: рекурсивный вызов функции в _хвостовой позиции_ может быть заменён на _прыжок_, который не занимает стековый фрейм. Вызов находится в _хвостовой позиции_, когда он сделан перед возвратом функции. Эта причина, почему мы наблюдали переполнение стека в примере выше - рекурсивный вызов `f` _не был_ в хвостовой позиции.
 
 In practice, the PureScript compiler does not replace the recursive call with a jump, but rather replaces the entire recursive function with a _while loop_.
 
+На практике, компилятор PureScript не заменяет рекурсивный вызов прыжком, а заменяет всю рекурсивную функцию циклом _while_.
+
 Here is an example of a recursive function with all recursive calls in tail position:
+
+Вот пример рекурсивной функции с вызовами в хвостовой позиции:
 
 ```haskell
 fact :: Int -> Int -> Int
@@ -604,11 +716,18 @@ fact n acc = fact (n - 1) (acc * n)
 
 Notice that the recursive call to `fact` is the last thing that happens in this function - it is in tail position.
 
-## Accumulators
+Обратите внимание что рекурсивный вызов `fact` это последнее, что происходит внутри функции - он в хвостовой позиции. (?)
+
+## Аккумуляторы
 
 One common way to turn a function which is not tail recursive into a tail recursive function is to use an _accumulator parameter_. An accumulator parameter is an additional parameter which is added to a function which _accumulates_ a return value, as opposed to using the return value to accumulate the result.
 
+Один из известных способов превратить рекурсивную функцию, не являющейся хвостовой, в хвостовую - это использовать _аккумуляторный параметр_. Аккумуляторный параметр - это дополнительный параметр, добавляемый в функцию, который _аккумулирует_ возвращающее значение, в отличие от использования возвращаемого значения для аккумулирования результата.
+
 For example, consider this array recursion which reverses the input array by appending elements at the head of the input array to the end of the result.
+
+Для примера, рассмотрим рекурсию на массиве, которая меняет местами элементы массива путём добавления головы входного массива в конец результирующего.
+
 
 ```haskell
 reverse :: forall a. Array a -> Array a
@@ -618,6 +737,8 @@ reverse xs = snoc (reverse (unsafePartial tail xs))
 ```
 
 This implementation is not tail recursive, so the generated JavaScript will cause a stack overflow when executed on a large input array. However, we can make it tail recursive, by introducing a second function argument to accumulate the result instead:
+
+Эта реализация не является хвостовой рекурсией, поэтому сгенерированный код будет создавать переполнение стека, при передачи в него большого массива. Однако, мы можем сделать из неё хвостовую рекурсию, добавив второй аргумент в функцию для аккумуляции результата:
 
 ```haskell
 reverse :: forall a. Array a -> Array a
