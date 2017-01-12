@@ -10,22 +10,42 @@ This chapter will introduce two new concepts: algebraic data types, and pattern 
 
 Pattern matching is a common technique in functional programming and allows the developer to write compact functions which express potentially complex ideas, by breaking their implementation down into multiple cases.
 
+Сопоставление с образцом это стандартная техника в функциональном программировании и она позволяет разработчику писать компактные функции, которые выражают потенциально сложные идеи, путем разбиения реализации на отдельные ступени.
+
 Algebraic data types are a feature of the PureScript type system which enable a similar level of expressiveness in the language of types - they are closely related to pattern matching.
+
+Алгебраические типы данных это свойство системы типов PureScript, которое делает доступным аналогичный уровень выразительности в языке типов. Они тесно связаны с сопоставлением с образцом. 
 
 The goal of the chapter will be to write a library to describe and manipulate simple vector graphics using algebraic types and pattern matching.
 
+Задачей этого раздела будет написать библиотеку для описания и манипуляции простой векторной графикой, используя алгебраические типы и сопоставление с образцом.
+
 ## Project Setup
+## Настройка проекта
 
 The source code for this chapter is defined in the file `src/Data/Picture.purs`. 
 
+Исходный код этого раздела находится в файле `src/Data/Picture.purs`.
+
 The project uses some Bower packages which we have already seen, and adds the following new dependencies:
 
+Проект использует некоторые пакеты Bower, которые мы уже видели и добавляет к ним следующие зависимости:
+
 - `purescript-globals`, which provides access to some common JavaScript values and functions.
+
+- `purescript-globals`, который предоставляет доступ к некоторым стандартным JavaScript значениям и функциям.
+
 - `purescript-math`, which provides access to the JavaScript `Math` module.
+
+- `purescript-math`, который предоставляет доступ к JavaScript модулю `Math`.
 
 The `Data.Picture` module defines a data type `Shape` for simple shapes, and a type `Picture` for collections of shapes, along with functions for working with those types.  
 
+Модуль `Data.Picture` определяет тип данных `Shape` для простых графических элементов и тип `Picture` для коллекций графических элементов, плюс функции для работы с этими типами.  
+
 The module imports the `Data.Foldable` module, which provides functions for folding data structures:
+
+Он также импортирует модуль `Data.Foldable`, который предоставляет функции для свертки структур данных:
 
 ```haskell
 module Data.Picture where
@@ -35,6 +55,8 @@ import Data.Foldable (foldl)
 ```
 
 The `Data.Picture` module also imports the `Global` and `Math` modules, but this time using the `as` keyword:
+
+`Data.Picture` также импортирует модули `Global` `Math`, но на этот раз используя ключевое слово `as`:
 
 ```haskell
 import Global as Global
