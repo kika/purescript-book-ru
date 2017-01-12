@@ -1,8 +1,12 @@
 # Pattern Matching
+# Сопоставление с образцом 
 
 ## Chapter Goals
+## Цели этого раздела
 
 This chapter will introduce two new concepts: algebraic data types, and pattern matching. We will also briefly cover an interesting feature of the PureScript type system: row polymorphism.
+
+Этот раздел вводит две новые концепции: алгебраические типы данных и сопоставление с образцом. Мы также вкратце затронем интересную особенность системы типов PureScript: полиморфизм рядов.
 
 Pattern matching is a common technique in functional programming and allows the developer to write compact functions which express potentially complex ideas, by breaking their implementation down into multiple cases.
 
