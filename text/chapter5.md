@@ -65,11 +65,18 @@ import Math as Math
 
 This makes the types and functions in those modules available for use, but only by using _qualified names_, like `Global.infinity` and `Math.max`. This can be useful to avoid overlapping imports, or just to make it clearer which modules certain things are imported from.
 
+Это делает типы и функции, определенные в этих модулях доступными для использования, но только используя _квалифицированные_ имена, такие как `Global.infinity` и `Math.max`. Это может быть полезным для предотвращения перекрывающихся импортированных имен или просто для того чтобы сделать более понятным из какого модуля были взяты те или иные компоненты. 
+
 _Note_: it is not necessary to use the same module name as the original module for a qualified import. Shorter qualified names like `import Math as M` are possible, and quite common.
 
+_Замечание_: необязательно использовать тоже самое имя модуля как и оригинальное при указании квалифицированного импорта. Более короткие квалифицированные имена, такие как `import Math as M` также возможны и часто используются.
+
 ## Simple Pattern Matching
+## Простое сопоставление с образцом
 
 Let's begin by looking at an example. Here is a function which computes the greatest common divisor of two integers using pattern matching:
+
+Давайте начнем с примера. Вот функция, которая вычисляет наибольший общий делитель двух целых чисел, используя сопоставление с образцом:
 
 ```haskell
 gcd :: Int -> Int -> Int
@@ -82,15 +89,31 @@ gcd n m = if n > m
 
 This algorithm is called the Euclidean Algorithm. If you search for its definition online, you will likely find a set of mathematical equations which look a lot like the code above. This is one benefit of pattern matching: it allows you to define code by cases, writing simple, declarative code which looks like a specification of a mathematical function.
 
+Этот алгоритм называется Алгоритмом Эвклида. Если вы поищете его описание в сети, то вы скорее всего найдете набор математических уравнений, которые выглядят очень похоже на этот код. Это одно из преимуществ сопоставления с образцом: оно позволяет вам писать простой, декларативный код, состоящий из отдельных особых вариантов, очень похожий на определение математической функции.
+
 A function written using pattern matching works by pairing sets of conditions with their results. Each line is called an _alternative_ or a _case_. The expressions on the left of the equals sign are called _patterns_, and each case consists of one or more patterns, separated by spaces. Cases describe which conditions the arguments must satisfy before the expression on the right of the equals sign should be evaluated and returned. Each case is tried in order, and the first case whose patterns match their inputs determines the return value.
+
+Функция, написанная с использованием сопоставления с образцом, работает путем установления соответствия между условиями и результатами. Каждая строка называется _альтернативной_ или _вариантом_. Выражения слева от знака равенства называются _образцами_ и каждый вариант состоит из одного или более образца, разделенных пробелом. Случаи описывают каким условиям должны удовлетворять аргументы, прежде чем выражение справа от знака равенства будет вычислено и вернуто из функции. Каждый случай пробуется по очереди и первый, чей образец совпадет с входными параметрами определит возвращаемое значение.
 
 For example, the `gcd` function is evaluated using the following steps:
 
+К примеру функция `gcd` вычисляется через следующие шаги:
+
 - The first case is tried: if the second argument is zero, the function returns `n` (the first argument).
+
+- Пробуется первый случай: если второй аргумент ноль, то функция возвращает `n` (первый аргумент).
+
 - If not, the second case is tried: if the first argument is zero, the function returns `m` (the second argument).
+
+- Если нет, то пробуется второй вариант: если первый аргумент ноль, то функция возвращает `m` (второй аргумент).
+
 - Otherwise, the function evaluates and returns the expression in the last line.
 
+- Иначе, функция вычисляется и возвращает выражение с последней строки.
+
 Note that patterns can bind values to names - each line in the example binds one or both of the names `n` and `m` to the input values. As we learn about different kinds of patterns, we will see that different types of patterns correspond to different ways to choose names from the input arguments.
+
+Обратите внимание что образцы могут привязывать значения к именам - каждая строка в примере связывает одно и или оба имени `n` и `m` с входными значениями. По мере изучения разных типов образцов мы увидим что разные типы образцов соответствуют разным способам связывания имен с входными аргументами.
 
 ## Simple Patterns
 
